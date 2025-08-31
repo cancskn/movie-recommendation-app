@@ -40,6 +40,7 @@ async function importMovies(pages = 5, start = 1) {
       movies.forEach(movie => {
         // Add genre names to the movie object
         movie.genres = movie.genre_ids.map(id => ({ id, name: genreMap[id] || 'Unknown' }));
+        movie.embedding = "[]";
         saveMovieToDB(movie);
         totalImported++;
       });

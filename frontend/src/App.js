@@ -20,6 +20,8 @@ function App() {
   // Smart Search
   const [smartMode, setSmartMode] = useState(false);
 
+  // Loading state
+  const [loading, setLoading] = useState(false);
 
   // When the film category changes
   const handleCategoryChange = (e) => {
@@ -38,9 +40,9 @@ function App() {
 
   // Function to get recommendations based on user inputs
   const getRecommendations = async () => {
+    setLoading(true); // Start loading
     try {
-      // Request to the backend server
-      const response = await axios.post('http://localhost:5000/api/movies', {
+      const requestData = {
         category,
         favoriteMovies,
         keywords,
@@ -50,16 +52,25 @@ function App() {
         endYear,
         beforeAfter,
         yearValue,
-        // smartMode,
-      });
+      };
+
+      // Choose endpoint based on smartMode
+      const endpoint = smartMode
+        ? "http://localhost:5000/api/smart-search"
+        : "http://localhost:5000/api/movies";
+
+      // Request to the backend server
+      const response = await axios.post(endpoint, requestData);
 
       // Set the recommendations state with the response data
       setRecommendations(response.data);
     } catch (error) {
       console.error('Error fetching data from backend:', error);
       setRecommendations([]);
+    } finally {
+      setLoading(false); // End loading
     }
-  }; // <- Burada fonksiyonun kapanış parantezi eksikti.
+  };
 
   return (
     <div className="App">
@@ -113,7 +124,6 @@ function App() {
 
       <div>
         <label>Year: </label>
-
         <select value={yearType} onChange={(e) => setYearType(e.target.value)}>
           <option value="">None</option>
           <option value="specific">Specific Year</option>
@@ -176,20 +186,22 @@ function App() {
         </label>
       </div>
 
-
       <button onClick={getRecommendations}>Get Recommendations</button>
 
       <div>
         <h2>Recommended Movies</h2>
-        <ul>
-          {recommendations.map((movie, index) => (
-            <li key={index}>
-              {movie.title} ({movie.release_date})
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <p>🔄 Loading recommendations...</p>
+        ) : (
+          <ul>
+            {recommendations.map((movie, index) => (
+              <li key={index}>
+                {movie.title} ({movie.year})
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-     
     </div>
   );
 }

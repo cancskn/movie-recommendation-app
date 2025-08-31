@@ -29,3 +29,5 @@ yarn-error.log*
 # custom: project specific
 /data/              
 backend/movies.db  
+node_modules/
+
