@@ -258,7 +258,7 @@ app.post('/api/smart-search', async (req, res) => {
     }
 
     const sql = `
-      SELECT id, title, overview, year, CAST(embedding AS BLOB) AS embedding
+      SELECT id, title, overview, year, poster_path, genres, CAST(embedding AS BLOB) AS embedding
       FROM movies
       WHERE ${conditions.join(" AND ")}
     `;
@@ -308,6 +308,8 @@ app.post('/api/smart-search', async (req, res) => {
           title: r.title,
           overview: r.overview,
           year: r.year,
+          poster_path: r.poster_path,
+          genres: r.genres,
           score
         });
       },
