@@ -1,70 +1,160 @@
-# Getting Started with Create React App
+# Movie Recommendation App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack movie recommendation system that combines TMDb’s movie data with semantic embeddings.
 
-## Available Scripts
+The app supports **two search modes**:
 
-In the project directory, you can run:
+- **Regular Search** – fetches results directly from TMDb’s API (using filters like popularity, year, genre). No AI involved.  
+- **Smart Search** – user keywords and/or favorite movies are converted into vectors with Hugging Face’s [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) model.  
+  These embeddings (384-dim float32 arrays stored as SQLite BLOBs) are compared against movie embeddings using the cosine similarity formula:
 
-### `npm start`
+  ```text
+  cos(A,B) = (A · B) / (||A|| · ||B||)
+  ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This enables **semantic similarity search**, so movies with related meaning (not just matching words) are recommended.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js ≥ 18, npm  
+- Python ≥ 3.10 (tested with 3.13.5)  
+- [TMDb API key](https://developer.themoviedb.org/docs/getting-started)
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Environment Variables
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Create **backend/.env**:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```env
+TMDB_API_KEY=your_tmdb_api_key_here
+```
 
-### `npm run eject`
+(Optional) Create **frontend/.env** used for test purposes:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```env
+REACT_APP_TMDB_API_KEY=your_tmdb_api_key_here
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Dependencies
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **Backend:** dependencies are listed in `backend/package.json`.  
+  Install them with:
+  ```bash
+  cd backend
+  npm install
+  ```
 
-## Learn More
+- **Frontend:** dependencies are listed in `frontend/package.json`.  
+  Install them with:
+  ```bash
+  cd frontend
+  npm install
+  ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Python (embeddings):** required for Smart Search.  
+  Install from `requirements.txt`:
+  ```bash
+  pip install -r requirements.txt
+  ```
+  Packages: `sentence-transformers`, `numpy`, `torch`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## Install & Run
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 1) Prepare embeddings (one-time, offline)
 
-### Analyzing the Bundle Size
+Stores float32 embeddings as SQLite BLOBs.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+**Windows (PyCharm Terminal / PowerShell):**
 
-### Making a Progressive Web App
+```powershell
+cd scripts
+py -m venv .venv
+.\.venv\Scripts\activate
+python -m pip install -U pip
+pip install -r requirements.txt
+python generate-embeddings.py
+# optional sanity check
+python check-embeddings.py
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+**macOS/Linux:**
 
-### Advanced Configuration
+```bash
+cd scripts
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+pip install -r requirements.txt
+python generate-embeddings.py
+# optional sanity check
+python check-embeddings.py
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 2) Start the backend
 
-### Deployment
+```bash
+cd backend
+npm install
+node server.js   # or: npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 3) Start the frontend
 
-### `npm run build` fails to minify
+```bash
+cd frontend
+npm install
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Now open the app at **http://localhost:3000**
+
+---
+
+## How Smart Search Works
+
+- **Offline**: `generate-embeddings.py` writes 384-dim float32 vectors to SQLite BLOBs.  
+- **Online**: User keywords → `keyword-embedding.py` encodes to a vector.  
+- **Ranking**: Backend decodes BLOB to `Float32Array` and sorts by cosine similarity:
+
+  ```text
+  cos(A,B) = (A · B) / (||A|| · ||B||)
+  ```
+
+---
+
+## API Endpoints (Backend)
+
+### Regular Search (filter-based, no text query)
+
+```http
+GET /api/regular-search?genre=<TMDbGenreId>&year=<YYYY>&page=1
+/api/regular-search?genre=28&year=2020&page=1
+/api/regular-search?year=1999&page=1
+/api/regular-search?startYear=1990&endYear=1999&page=1
+```
+
+### Smart Search
+
+```http
+POST /api/smart-search
+Content-Type: application/json
+
+{
+  "keywords": "funny space adventure",
+  "favoriteMovies": ["Guardians of the Galaxy"],
+  "limit": 10
+}
+```
+
+---
+
+⚠️ **Note:** Smart Search requires pre-imported movies with embeddings in the SQLite DB.  
+Run `generate-embeddings.py` first.  
+Regular Search works without this step since it fetches data directly from TMDb.
