@@ -134,7 +134,7 @@ Now open the app at **http://localhost:3000**
 ### Regular Search (filter-based, no text query)
 
 ```http
-GET /api/regular-search?genre=<TMDbGenreId>&year=<YYYY>&page=1
+GET  /api/regular-search?genre=<TMDbGenreId>&year=<YYYY>&page=1
 GET  /api/regular-search?genre=28&year=2020&page=1
 GET  /api/regular-search?year=1999&page=1
 GET  /api/regular-search?startYear=1990&endYear=1999&page=1
