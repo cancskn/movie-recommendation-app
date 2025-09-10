@@ -233,7 +233,13 @@ app.post('/api/smart-search', async (req, res) => {
     for (let i = 0; i < userArr.length; i++) userNormed[i] = userArr[i] / normA;
 
     // --- 2) Build SQL with filters ---
-    let conditions = ["embedding IS NOT NULL"];
+    let conditions = [
+      "embedding IS NOT NULL",
+      "overview IS NOT NULL",
+      "TRIM(overview) <> ''",
+      "poster_path IS NOT NULL",
+      "TRIM(poster_path) <> ''",
+    ];
     let params = [];
 
     if (yearType === "specific" && specificYear) {
@@ -253,12 +259,16 @@ app.post('/api/smart-search', async (req, res) => {
     }
 
     if (category) {
-      conditions.push("LOWER(genres) LIKE ?");
-      params.push(`%${category.toLowerCase()}%`);
+      const gid = genreIds[category.toLowerCase()];
+      if (gid) {
+        // genres is like "12,16,878"
+        conditions.push("(',' || genres || ',') LIKE ?");
+        params.push(`%,${gid},%`);
     }
+  }
 
     const sql = `
-      SELECT id, title, overview, year, poster_path, genres, CAST(embedding AS BLOB) AS embedding
+      SELECT id, title, overview, year AS release_date, rating AS vote_average, poster_path, genres, CAST(embedding AS BLOB) AS embedding
       FROM movies
       WHERE ${conditions.join(" AND ")}
     `;
@@ -307,7 +317,8 @@ app.post('/api/smart-search', async (req, res) => {
           id: r.id,
           title: r.title,
           overview: r.overview,
-          year: r.year,
+          release_date: r.release_date,
+          vote_average: r.vote_average,
           poster_path: r.poster_path,
           genres: r.genres,
           score

@@ -21,7 +21,7 @@ export default function MovieCard({ movie }) {
 
       <div className="flex items-center justify-between mt-2">
         <p className="text-xs text-gray-500">
-          {movie.release_date ? `📅 ${movie.release_date}` : ""}
+          {movie.release_date ? `📅 ${new Date(movie.release_date).getFullYear?.() || movie.release_date}` : ""}
         </p>
         {movie.vote_average && (
           <span className="text-xs font-semibold text-yellow-600">
@@ -30,7 +30,7 @@ export default function MovieCard({ movie }) {
         )}
       </div>
 
-      {movie.genres && (
+      {false && movie.genres && (
         <div className="flex flex-wrap gap-1 mt-2">
           {Array.isArray(movie.genres)
             ? movie.genres.map((g) => (
