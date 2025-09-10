@@ -244,19 +244,20 @@ app.post('/api/smart-search', async (req, res) => {
 
     if (yearType === "specific" && specificYear) {
       conditions.push("year = ?");
-      params.push(specificYear);
+      params.push(parseInt(specificYear, 10));
     } else if (yearType === "between" && startYear && endYear) {
       conditions.push("year BETWEEN ? AND ?");
-      params.push(startYear, endYear);
+      params.push(parseInt(startYear, 10), parseInt(endYear, 10));
     } else if (yearType === "beforeAfter" && yearValue) {
       if (beforeAfter === "before") {
         conditions.push("year <= ?");
-        params.push(yearValue);
+        params.push(parseInt(yearValue, 10));
       } else {
         conditions.push("year >= ?");
-        params.push(yearValue);
+        params.push(parseInt(yearValue, 10));
       }
     }
+
 
     if (category) {
       const gid = genreIds[category.toLowerCase()];
