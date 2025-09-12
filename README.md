@@ -2,11 +2,8 @@
 
 A full-stack movie recommendation system that combines TMDb’s movie data with semantic embeddings.
 
-## 🎬 Demo
+▶ [Watch demo](https://drive.google.com/file/d/1cmLa07NDQQYyhn9_R0uOQbMTWp9fZXGm/view?usp=sharing) – Regular vs Smart Search, Year filters, favorite movies, and keyword search.
 
-[▶ Watch demo](https://github.com/cancskn/smart-film-suggestor/releases/download/v1.0/film-suggestor-v1.0.gif)
-
-Includes Regular vs Smart Search, Year filters, favorite movies, and keyword search.
 
 ---
 
