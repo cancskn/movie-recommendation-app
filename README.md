@@ -2,7 +2,7 @@
 
 A full-stack movie recommendation system that combines TMDb’s movie data with semantic embeddings.
 
-▶ [Watch demo](https://drive.google.com/file/d/1cmLa07NDQQYyhn9_R0uOQbMTWp9fZXGm/view?usp=sharing) – Regular vs Smart Search, Year filters, favorite movies, and keyword search.
+▶ [Watch demo](https://youtu.be/P5eRsLlewbg) – Regular vs Smart Search, Year filters, favorite movies, and keyword search.
 
 
 ---
