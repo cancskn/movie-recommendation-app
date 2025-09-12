@@ -21,7 +21,9 @@ export default function MovieCard({ movie }) {
 
       <div className="flex items-center justify-between mt-2">
         <p className="text-xs text-gray-500">
-          {movie.release_date ? `📅 ${new Date(movie.release_date).getFullYear?.() || movie.release_date}` : ""}
+          {movie.release_date
+           ? `📅 ${String(movie.release_date).slice(0,4)}` 
+           : ""}
         </p>
         {movie.vote_average && (
           <span className="text-xs font-semibold text-yellow-600">

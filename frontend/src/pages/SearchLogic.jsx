@@ -31,7 +31,7 @@ export default function SearchLogic() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6">🎬 AI Movie Recommendation</h1>
+      <h1 className="text-3xl font-bold mb-6">🎬 Smart Film Suggestor</h1>
 
       <SearchBar onSearch={handleSearch} />
 

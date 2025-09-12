@@ -1,6 +1,14 @@
-# Movie Recommendation App
+# Smart Film Suggestor
 
 A full-stack movie recommendation system that combines TMDb’s movie data with semantic embeddings.
+
+## 🎬 Demo
+
+[▶ Watch demo](https://github.com/cancskn/smart-film-suggestor/releases/download/v1.0/film-suggestor-v1.0.gif)
+
+Includes Regular vs Smart Search, Year filters, favorite movies, and keyword search.
+
+---
 
 The app supports **two search modes**:
 
