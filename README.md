@@ -21,6 +21,13 @@ This enables **semantic similarity search**, so movies with related meaning (not
 
 ---
 
+## Technologies
+
+- **Backend:** Node.js (Express), Python (embeddings), SQLite  
+- **Frontend:** React  
+- **External API:** TMDb API  
+- **API Design:** RESTful API
+
 ## Prerequisites
 
 - Node.js ≥ 18, npm  
